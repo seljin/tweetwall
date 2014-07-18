@@ -1,0 +1,15 @@
+{
+  "name": "api",
+  "version": "0.0.1",
+  "description": "tweetwall api",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "seljin",
+  "license": "ISC",
+  "devDependencies": {
+    "node-tweet-stream": "^1.1.15",
+    "socket.io": "^1.0.6"
+  }
+}

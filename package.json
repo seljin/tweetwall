@@ -1,0 +1,27 @@
+{
+  "name": "tweetwall",
+  "version": "0.0.1",
+  "description": "a simple tweet wall",
+  "scripts": {
+    "start": "node app.js",
+    "postinstall": "(cd api && npm install)"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seljin/tweetwall.git"
+  },
+  "keywords": [
+    "tweet",
+    "twitter"
+  ],
+  "author": "seljin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/seljin/tweetwall/issues"
+  },
+  "homepage": "https://github.com/seljin/tweetwall",
+  "dependencies": {
+    "express": "^4.6.1",
+    "jade": "^1.4.2"
+  }
+}
