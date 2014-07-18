@@ -1,6 +1,6 @@
 var io = require('socket.io')(8000);
-var express = require('express');
-var app = express();
+// var express = require('express');
+// var app = express();
 var Twit = require('node-tweet-stream');
 
 var stream = new Twit({
@@ -33,44 +33,23 @@ stream.on('error', function (err) {
 //todo remove hashtable not usefull anymore : use array
 var tracked = {};
 
-processTweet = function(tweet) {
+stream.on('tweet', function (tweet) {
     hashtags = tweet.entities.hashtags;
     for (var i = 0; i < hashtags.length; i++){
         var text = hashtags[i].text.toLowerCase();
 
-        if (tracked[text]){
-            var s = tracked[text];
-
+        if (tracked[text])
             io.to(text).emit('tweet', tweet);
-            console.log('emit ', text);
-            // if(s) s.emit('tweet', tweet);
-            // console.log('yes');
-        }
     }
-}
-
-stream.on('tweet', function (tweet) {
-    var msg = {
-        text: tweet.text,
-        user: {
-            name: tweet.user.name,
-            image: tweet.user.profile_image_url
-        }
-    };
- 
-    console.log('tweet');
-    processTweet(tweet);
-    //io.emit('tweet', tweet);
 });
 
-// =====TODO count clients to stop tracking when no more clients ==============================
+// =====TODO count clients to stop tracking and emit when no more clients ==============================
 // ====================== TODO ============================== 
 io.on('connection', function(socket){
     console.log('connected');
 
     socket.on('disconnect', function() {
         console.log('client disconnected');
-
     });
 
     socket.on('track', function(hash) {
@@ -88,15 +67,15 @@ io.on('connection', function(socket){
     });
 });
 
-app.get('/:hashtag', function(req, res) {
-    hashtag = req.param('hashtag');
-    if(!hashtag) return res.end('Hashtag needed');
-    if(tracked[hashtag]) return res.end('already tracked');
+// app.get('/:hashtag', function(req, res) {
+//     hashtag = req.param('hashtag');
+//     if(!hashtag) return res.end('Hashtag needed');
+//     if(tracked[hashtag]) return res.end('already tracked');
 
-    tracked[hashtag] = true;
+//     tracked[hashtag] = true;
     
-    stream.track('#' + hashtag);
-    res.end('#' + hashtag);
-});
+//     stream.track('#' + hashtag);
+//     res.end('#' + hashtag);
+// });
 
-module.exports = app;
+module.exports = io;

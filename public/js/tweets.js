@@ -1,27 +1,22 @@
-var app = angular.module('tweetWall', []);
+var app = angular.module('tweetWall', ['ngRoute']);
 
-// app.config(function ($routeProvider) {
-//   $routeProvider
-//     .when('/:hashtag',
-//     {
-//       templateUrl: 'index.html',
-//       controller: 'TweetController'
-//     }
-//   )
-// });
-
-app.controller('TweetController', ['$scope', function($scope, $routeParams) {
-  $scope.tweets = [];
+app.controller('TweetController', ['$scope', '$location', function($scope, $location) {
   var socket = io.connect('http://localhost:8000/');
   var currentHash = null;
+  var param = $location.search() || null;
 
-  console.log($routeParams);
+  $scope.h = param['h'];   
+  $scope.tweets = [];
 
   socket.on('tweet', function(tweet){
     $scope.tweets.unshift(tweet);
-    console.log($scope.tweets);
     $scope.$apply();
   });
+
+  if ($scope.h){
+    socket.emit('track', $scope.h);
+    currentHash = $scope.h;
+  }
 
   $scope.changeHash = function(){
     var hashtag = $scope.hashtag.toLowerCase();
@@ -30,5 +25,6 @@ app.controller('TweetController', ['$scope', function($scope, $routeParams) {
     if (currentHash) socket.emit('untrack', currentHash);  
     socket.emit('track', hashtag);
     currentHash = hashtag;
+    $scope.shareUrl = $location.absUrl() + '#?h=' + hashtag;
   };
 }]);

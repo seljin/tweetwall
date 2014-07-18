@@ -10,8 +10,8 @@ app.set('view engine', 'jade');
 
 app.use(express.static('public'));
 
-app.use('/api', api);
-app.get('/', function(req, res) {
+// app.use('/api', api);
+app.get('*', function(req, res) {
   res.render('index');
 });
 
