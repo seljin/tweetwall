@@ -30,16 +30,21 @@ stream.on('error', function (err) {
     console.log('error : ', err);
 });
 
+//todo remove hashtable not usefull anymore : use array
 var tracked = {};
 
 processTweet = function(tweet) {
     hashtags = tweet.entities.hashtags;
     for (var i = 0; i < hashtags.length; i++){
         var text = hashtags[i].text.toLowerCase();
+
         if (tracked[text]){
             var s = tracked[text];
-            if(s) s.emit('tweet', tweet);
-            console.log('yes');
+
+            io.to(text).emit('tweet', tweet);
+            console.log('emit ', text);
+            // if(s) s.emit('tweet', tweet);
+            // console.log('yes');
         }
     }
 }
@@ -58,30 +63,37 @@ stream.on('tweet', function (tweet) {
     //io.emit('tweet', tweet);
 });
 
+// =====TODO count clients to stop tracking when no more clients ==============================
+// ====================== TODO ============================== 
 io.on('connection', function(socket){
+    console.log('connected');
+
     socket.on('disconnect', function() {
-        console.log('\n\nclient disconnected\n\n');
+        console.log('client disconnected');
+
+    });
+
+    socket.on('track', function(hash) {
+        console.log('client tracking ', hash);
+
+        socket.join(hash);
+        tracked[hash] = true;
+        stream.track('#' + hash);
+    });
+
+    socket.on('untrack', function(hash) {
+        console.log('client utracking ', hash);
+
+        socket.leave(hash);
     });
 });
 
 app.get('/:hashtag', function(req, res) {
     hashtag = req.param('hashtag');
-    if(!hashtag) res.end('Hashtag needed');
-    if(tracked[hashtag]) res.end('already tracked');
+    if(!hashtag) return res.end('Hashtag needed');
+    if(tracked[hashtag]) return res.end('already tracked');
 
-    var s = io.of('/' + hashtag);
-
-    tracked[hashtag] = s;
-    // =====TODO count clients to stop tracking when no more clients ==============================
-    s.on('connection', function(socket){
-        console.log('connection');
-        socket.on('disconnect', function(){
-            console.log('disconnected!!');
-            // stream.untrack('#' + hashtag);
-            // delete tracked[hashtag.toLowerCase()];
-        });
-    });
-    // ====================== TODO ==============================
+    tracked[hashtag] = true;
     
     stream.track('#' + hashtag);
     res.end('#' + hashtag);

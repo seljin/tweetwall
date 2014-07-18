@@ -1,7 +1,9 @@
 doctype html
 html(ng-app='tweetWall')
+  ng-view
   head
     script(src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.15/angular.js")
+    script(src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.15/angular-route.js")
     script(src="http://localhost:8000/socket.io/socket.io.js")
     script(src="js/tweets.js")
   body
@@ -13,4 +15,4 @@ html(ng-app='tweetWall')
         ul#tweets
           li(ng-repeat='tweet in tweets')
             img(src='{{tweet.user.profile_image_url}}')
-            {{tweet.user.name}} : {{tweet.text}}
+            | {{tweet.user.name}} : {{tweet.text}}

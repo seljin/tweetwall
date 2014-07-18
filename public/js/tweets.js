@@ -1,25 +1,34 @@
-angular.module('tweetWall', [])
-  .controller('TweetController', ['$scope', '$http', function($scope, $http) {
+var app = angular.module('tweetWall', []);
+
+// app.config(function ($routeProvider) {
+//   $routeProvider
+//     .when('/:hashtag',
+//     {
+//       templateUrl: 'index.html',
+//       controller: 'TweetController'
+//     }
+//   )
+// });
+
+app.controller('TweetController', ['$scope', function($scope, $routeParams) {
+  $scope.tweets = [];
+  var socket = io.connect('http://localhost:8000/');
+  var currentHash = null;
+
+  console.log($routeParams);
+
+  socket.on('tweet', function(tweet){
+    $scope.tweets.unshift(tweet);
+    console.log($scope.tweets);
+    $scope.$apply();
+  });
+
+  $scope.changeHash = function(){
+    var hashtag = $scope.hashtag.toLowerCase();
+
     $scope.tweets = [];
-    var socket = null;
-
-    onTweet = function(data){
-      $scope.tweets.push(data);
-      console.log(data);
-      $scope.$apply();
-    };
-
-    $scope.changeHash = function(){
-      var hashtag = $scope.hashtag.toLowerCase();
-
-      $scope.tweets = [];
-      $http.get('/api/' + hashtag).success(function(){  
-        if (socket) {
-          socket.disconnect();
-          delete socket;
-        }
-        socket = io.connect('http://localhost:8000/' + hashtag);
-        socket.on('tweet', onTweet);
-      });
-    };
-  }]);
+    if (currentHash) socket.emit('untrack', currentHash);  
+    socket.emit('track', hashtag);
+    currentHash = hashtag;
+  };
+}]);
