@@ -3,6 +3,7 @@ var express = require('express');
 var session = require('express-session');
 var bodyParser = require('body-parser');
 var path = require('path');
+var sass = require('node-sass');
 
 var util = require('util');
 
@@ -19,21 +20,25 @@ app.use(session({
   saveUninitialized: true,
   resave: true
 }));
-// app.use('/api', api);
+app.use(sass.middleware({
+    src: path.join(__dirname, 'sassheets/'),
+    dest: path.join(__dirname, 'public/'),
+    debug: true
+}));
 
 app.get('/login', function(req, res){
   if (req.query.oauth_token && req.query.oauth_verifier && req.session.oauth) {
-    api.getAccessToken(req.session.oauth.token, req.session.oauth.tokenSecret, req.query.oauth_verifier, 
+    api.getAccessToken(req.session.oauth.token, req.session.oauth.tokenSecret, req.query.oauth_verifier,
       function(error, accessToken, accessTokenSecret, results) {
         if (error) {
-            console.log(error);
+            console.log('Error getting access tokens : ', util.inspect(error));
+            res.send(500, 'Something went wrong while getting access tokens');
         } else {
           req.session.twitTokens = {
             accessToken: accessToken,
             accessTokenSecret: accessTokenSecret
-          };
-          console.log('authed: ',req.session.twitTokens);          
-          //Step 4: Verify Credentials belongs here
+          };          
+          //Verify Credentials belongs here
           res.redirect('/');
         }
     });
@@ -41,10 +46,9 @@ app.get('/login', function(req, res){
   else {
     api.getRequestToken(function(error, requestToken, requestTokenSecret, results){
       if (error) {
-        console.log("Error getting OAuth request token : " + util.inspect(error));
-        res.send('error');
+        console.log('Error getting OAuth request tokens : ', util.inspect(error));
+        res.send(500, 'Error with OAuth');
       } else {
-        console.log('redirecting to twiter');
         req.session.oauth = {
           token: requestToken,
           tokenSecret: requestTokenSecret
@@ -58,27 +62,23 @@ app.get('/login', function(req, res){
 app.post('/tweet', function(req, res) {
   var tokens = req.session.twitTokens;
   if (!tokens)
-    res.send('need to log in with twitter');
+    res.send(500, 'you need to log in with twitter');
   else {
-    console.log('tweet attempt :', req.body.tweet);
     api.statuses('update', {status: req.body.tweet},
       tokens.accessToken,
       tokens.accessTokenSecret,
       function(error, data, response) {
         if (error){
           console.log(util.inspect(error));
-          res.send('something went wrong')
+          res.send(500, 'Something went wrong while tweet attempt');
         } else {
-          console.log(data);
+          res.send('ok');
         }
-      }
-    );
+    });
   }
 });
 
-app.get('/', function(req, res) {
-  
-  console.log('twit: ',req.session.twitTokens);
+app.get('/', function(req, res) {  
   res.render('index', {authed: (req.session.twitTokens ? true : false)});
 });
 
