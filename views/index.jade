@@ -9,10 +9,16 @@ html(ng-app='tweetWall')
   body
     div(ng-controller='TweetController')
       h1='Simple Tweet Wall'
-        form(ng-submit='changeHash()')
-          input(ng-hide='h', type='text', ng-model='hashtag', size='140', placeholder='hashtag')
-          input(ng-hide='h', type='submit', value='go')
-        input(ng-hide='h', type='text', placeholder='lien de partage', value='{{shareUrl}}')
+        form(ng-hide='h', ng-submit='changeHash()')
+          input(type='text', ng-model='hashtag', size='140', placeholder='hashtag')
+          input(type='submit', value='go')
+        a(ng-show='shareUrl', target='_blank', href='{{shareUrl}}') {{shareUrl}}
+        if authed
+          form(ng-show='shareUrl', ng-submit='tweet()')
+            input(type='text', ng-model='tweetText', size='140', placeholder='status text')
+            input(type='submit', value='tweet')
+        else
+          a(ng-hide='h', href='/login',)= 'Sign in with twitter to tweet'
         ul#tweets
           li#tweet(ng-repeat='tweet in tweets')
             img(src='{{tweet.user.profile_image_url}}')

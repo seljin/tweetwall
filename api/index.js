@@ -1,13 +1,18 @@
-var io = require('socket.io')(8000);
-// var express = require('express');
-// var app = express();
 var Twit = require('node-tweet-stream');
+var TwitterApi = require('node-twitter-api');
+var io = require('socket.io')(8000);
 
 var stream = new Twit({
     consumer_key:         '',
     consumer_secret:      '',
     token:         '',
     token_secret:  ''
+});
+
+var twitter = new TwitterApi({
+    consumerKey:            '',
+    consumerSecret:        '',
+    callback:               'http://localhost:3000/login'
 });
 
 stream.on('connect', function(request) {
@@ -67,15 +72,4 @@ io.on('connection', function(socket){
     });
 });
 
-// app.get('/:hashtag', function(req, res) {
-//     hashtag = req.param('hashtag');
-//     if(!hashtag) return res.end('Hashtag needed');
-//     if(tracked[hashtag]) return res.end('already tracked');
-
-//     tracked[hashtag] = true;
-    
-//     stream.track('#' + hashtag);
-//     res.end('#' + hashtag);
-// });
-
-module.exports = io;
+module.exports = twitter;

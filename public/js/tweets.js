@@ -1,6 +1,6 @@
 var app = angular.module('tweetWall', ['ngRoute']);
 
-app.controller('TweetController', ['$scope', '$location', function($scope, $location) {
+app.controller('TweetController', ['$scope', '$location', '$http', function($scope, $location, $http) {
   var socket = io.connect('http://localhost:8000/');
   var currentHash = null;
   var param = $location.search() || null;
@@ -26,5 +26,11 @@ app.controller('TweetController', ['$scope', '$location', function($scope, $loca
     socket.emit('track', hashtag);
     currentHash = hashtag;
     $scope.shareUrl = $location.absUrl() + '#?h=' + hashtag;
+  };
+
+  $scope.tweet = function(){
+    $http.post('/tweet', {tweet: $scope.tweetText + ' #' + currentHash}).success(function(){
+      console.log('tweeted!');
+    });
   };
 }]);
