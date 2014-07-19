@@ -1,0 +1,58 @@
+$font-stack:    15px Helvetica, sans-serif;
+$primary-color: #66CCFF;
+
+html {
+  background-color: #F2F2F2;
+}
+
+body {
+  display: block;
+  width: 50%;
+  margin: 0 auto;
+  position: relative;
+  font: $font-stack;  
+}
+
+h1 {
+  color: $primary-color;
+}
+
+.signin {
+  display: block;
+  position: absolute;
+  top: 0; right: 0;
+  width: 135px; height: 30px;
+  background: url(twitbutton.png) 0 0 no-repeat;
+}
+
+.text {
+  width: 80%; height: 25px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.button {
+  height: 31px;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0px;
+}
+
+li {
+  margin-bottom: 15px;
+  border: 1px solid #C2C2B2;
+  border-radius: 10px;
+  min-height: 50px;
+  background-color: $primary-color;
+  box-shadow: 4px 4px 4px 0 #C2C2B2;
+}
+
+img {
+  border-radius: 50%;
+  float: left;
+  margin-left: -20px;
+  margin-top: -10px;
+  margin-right: 5px;
+}
